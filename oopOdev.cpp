@@ -8,7 +8,7 @@ using namespace std;
 
 #define SEP setw(0) << " |"
 
-enum choice {
+enum Choice {
 	ch_exit = 0,
 	ch_all = 1,
 	ch_kalanlar = 2,
@@ -16,50 +16,92 @@ enum choice {
 	ch_dosya = 4,
 };
 
+std::istream& operator>>(std::istream& in, Choice& choice) {
+    int value;
+    in >> value; // Read an integer
+    choice = static_cast<Choice>(value); // Cast to enum
+    return in;
+}
+
+const int DURUM_KALDI = 0;
+const int DURUM_GECTI = 1;
+
+const int DURUM_HEPSI = 2;
+
 // `setw` değerleri
-const _Setw cols[] = { 
+const std::_Setw cols[] = { 
 	setw(strlen("Numara") + 1),
-	setw(strlen("Ara Sınav") + 2),
-	setw(strlen("2. Sınav") + 2),
+	setw(strlen("Ara Sinav") + 2),
+	setw(strlen("2. Sinav") + 2),
 	setw(strlen("Ödev") + 2),
 	setw(strlen("Final") + 2),
 	setw(strlen("Devam") + 2),
 	setw(strlen("Durum") + 2),
-	setw(15),
+	setw(2), // İsimden önceki boşluk
 };
 
+// # Öğrenci Listesi
 class Student{
     private:
-    string *studentNames;
-    string *studentIDs;
-    float *midterm;
-    float *secondExam;
-    float *assignment;
-    float *final;
-    int *numberOfAttendance;
-    int studentCount;//öğrenci sayısını tutar
+			string *studentNames;
+			string *studentIDs;
+			float *midterm;
+			float *secondExam;
+			float *assignment;
+			float *finalExam;
+			int *numberOfAttendance;
+			int studentCount;//öğrenci sayısını tutar
+
+
+			void print_row(int i, std::ostream& output) const {
+				output
+					<< cols[0] << studentIDs[i] << SEP
+					<< cols[1] << midterm[i] << SEP
+					<< cols[2] << secondExam[i] << SEP
+					<< cols[3] << assignment[i] << SEP
+					<< cols[4] << finalExam[i] << SEP
+					<< cols[5] << numberOfAttendance[i] << SEP
+					<< cols[6] << ((average(i) <= 50) ? "Kaldi" : "Gecti") << SEP
+					<< left << cols[7] << "" << studentNames[i] << right
+					<< endl;
+			}
+
+			static void print_header(ostream& output) {
+				output
+					<< cols[0] << "Numara" << SEP
+					<< cols[1] << "Ara Sinav" << SEP
+					<< cols[2] << "2. Sinav" << SEP
+					<< cols[3] << "Odev" << SEP
+					<< cols[4] << "Final" << SEP
+					<< cols[5] << "Devam" << SEP 
+					<< cols[6] << "Durum" << SEP
+					<< left << cols[7] << "" << "Isim" << right
+					<< endl;
+			}
 
     public:
-        //constuctor
-        Student(int number){//öğrenci sayısınca diziler olsturur
-            studentCount = number;
+        // Constuctor
+        Student(int studentCount){
+            this->studentCount = studentCount;
+
+						// Dizileri öğrenci sayısınca dinamik şekilde oluşturur
             studentNames = new string[studentCount];
             studentIDs = new string[studentCount];
             midterm = new float[studentCount];
             secondExam = new float[studentCount];
             assignment = new float[studentCount];
-            final = new float[studentCount];
+            finalExam = new float[studentCount];
             numberOfAttendance = new int[studentCount];
         }
         //destructor
         ~Student(){
-        delete[] studentNames;
-        delete[] studentIDs;
-        delete[] midterm;
-        delete[] secondExam;
-        delete[] assignment;
-        delete[] final;
-        delete[] numberOfAttendance;
+					delete[] studentNames;
+					delete[] studentIDs;
+					delete[] midterm;
+					delete[] secondExam;
+					delete[] assignment;
+					delete[] finalExam;
+					delete[] numberOfAttendance;
         }
 
 				// Dosyadan öğrencilerin bilgisini okur ve onları ilgili dizilerine kaydeder
@@ -84,13 +126,13 @@ class Student{
                 tempstring.ignore(1); 
                 tempstring >> assignment[i];
                 tempstring.ignore(1); 
-                tempstring >> final[i];
+                tempstring >> finalExam[i];
                 tempstring.ignore(1);
 
 								// Stringstream ile tek bir satır alınan string akışa çevrildikten
 								// sonra devam sayısının olduğu satırda sayı yazmıyorsa son eleman
 								// doğal olarak ',' olacak.
-								// Son eleman ',' ise 0 değilse o değeri devam sayısına koyacak.
+								// Son eleman ',' ise 0, değilse o değeri devam sayısına koyacak.
 								
 								// Yoklama verisi yoksa
                 if(tempstring.peek() == ',' || tempstring.eof()) {
@@ -107,34 +149,8 @@ class Student{
 
 				// Öğrenci sınav ortalaması
         float average(int i) const {
-            return (midterm[i] + secondExam[i] + assignment[i] + final[i]) / 4;
+            return (midterm[i] + secondExam[i] + assignment[i] + finalExam[i]) / 4;
         }
-
-				void print_row(int i, std::ostream& output) const {
-					output
-						<< cols[0] << studentIDs[i] << SEP
-						<< cols[1] << midterm[i] << SEP
-						<< cols[2] << secondExam[i] << SEP
-						<< cols[3] << assignment[i] << SEP
-						<< cols[4] << final[i] << SEP
-						<< cols[5] << numberOfAttendance[i] << SEP
-						<< cols[6] << ((average(i) < 50) ? "Kaldi" : "Gecti") << SEP
-						<< cols[7] << studentNames[i]
-						<< endl;
-				}
-
-				static void print_header(ostream& output) {
-					output
-						<< cols[0] << "Numara" << SEP
-						<< cols[1] << "Ara Sinav" << SEP
-						<< cols[2] << "2. Sinav" << SEP
-						<< cols[3] << "Odev" << SEP
-						<< cols[4] << "Final" << SEP
-						<< cols[5] << "Devam" << SEP 
-						<< cols[6] << "Durum" << SEP
-						<< cols[7] << "Isim"
-						<< endl;
-				}
 
         void print() const{
 
@@ -145,30 +161,41 @@ class Student{
 					}
         }
 
-        void print(int choice){
+
+        void print(int durum){
 
 					print_header(cout);
 
 					for(int i = 0; i < studentCount - 1; i++){
 						//geçenlerden 50 ve 50'den aşağısını alma
-						if((average(i)) <= 50 && choice == choice::ch_gecenler)
+						if((average(i)) <= 50 && durum == DURUM_GECTI)
 								continue;
 						//kalanlardan 50 yukarısını alma
-						else if((average(i)) > 50 && choice == choice::ch_kalanlar)
+						else if((average(i)) > 50 && durum == DURUM_KALDI)
 								continue;
 
 						print_row(i, cout);
 					}
         }
 
-         void print(const string &fname){
+         int print(int durum, const string &fname){
             ofstream printfile(fname + ".txt");
+
+						if (printfile.fail()) return -1; // FAIL
 
 						print_header(printfile);
 
-            for(int i = 0; i < studentCount - 1; i++){
+						for(int i = 0; i < studentCount - 1; i++){
+							//geçenlerden 50 ve 50'den aşağısını alma
+							if((average(i)) <= 50 && durum == DURUM_GECTI)
+									continue;
+							//kalanlardan 50 yukarısını alma
+							else if((average(i)) > 50 && durum == DURUM_KALDI)
+									continue;
+
 							print_row(i, printfile);
-            }
+						}
+						return 0; // OK
         }
 };
 
@@ -194,40 +221,58 @@ int main() {
     
     while(true){
         cout 
-					<< "Tüm öğrencileri görmek için             (" << choice::ch_all << ")" << endl
-					<< "Kalan ögrencilerin bilgisi için         (" << choice::ch_kalanlar << ")" << endl
-					<< "Gecen öğrencilerin bilgisi için         (" << choice::ch_gecenler << ")" << endl
-					<< "Ögrenci bilgilerini dosyaya yazmak için (" << choice::ch_dosya << ")" << endl
-					<< "Programdan çıkmak için                  (" << choice::ch_exit << ")" << endl
+					<< "Tüm öğrencileri görmek için             (" << ch_all << ")" << endl
+					<< "Kalan ögrencilerin bilgisi için         (" << ch_kalanlar << ")" << endl
+					<< "Gecen öğrencilerin bilgisi için         (" << ch_gecenler << ")" << endl
+					<< "Ögrenci bilgilerini dosyaya yazmak için (" << ch_dosya << ")" << endl
+					<< "Programdan çıkmak için                  (" << ch_exit << ")" << endl
 					<< ":";
         
-        enum choice choice;
-        cin >> *((int *)&choice);
-        if(choice == choice::ch_exit)
-            break;
-        
-        students.readFromCSV();//öğrencileri burada kaydediyor
+        enum Choice choice;
+        cin >> choice;
+        cin.ignore();
+				
+        students.readFromCSV(); //öğrencileri dosyadan oku
         
         switch(choice){
-						case choice::ch_kalanlar:
-                students.print(choice);
+						case ch_kalanlar:
+                students.print(DURUM_KALDI);
                 break;
-						case choice::ch_gecenler:
-                students.print(choice);
+						case ch_gecenler:
+                students.print(DURUM_GECTI);
                 break;
-						case choice::ch_all:
+						case ch_all:
                 students.print();
                 break;
-						case choice::ch_dosya: {
-                cin.ignore();
-                string FileName;
-                getline(cin, FileName);
-                students.print(FileName);//dosya ismi ile tüm öğrencileri kaydet
-                cout << "Dosya başarılı bir şekilde oluşturuldu.\n";
+						case ch_dosya: {
+								int durum;
+                string fileName;
+
+								cout <<
+									"Kalanlar için 0" << endl <<
+									"Geçenler için 1" << endl <<
+									"Tüm liste için 2" << endl <<
+									": ";
+								cin >> durum;
+								cin.ignore();
+
+								cout << "Yazılacak dosya adı: ";
+                getline(cin, fileName);
+
+                int error = students.print(durum, fileName);
+
+								if (error != 0)
+									cerr << "Dosya yazılırken bir hata oluştu!" << endl;
+								else
+									cout << "Dosya başarılı bir şekilde oluşturuldu: \"" << fileName << ".txt\"" << endl;
+
                 break;
 						}
+						case ch_exit:
+								cout << "Çıkış..." << endl;
+								exit(0); // OK
 						default:
-								cout << "Yanlış bir seçim girdiniz.\n";
+								cout << "Yanlış bir seçim girdiniz." << endl;
 								break;
         }
         
