@@ -1,4 +1,5 @@
 *.exe
 *.out
+*.txt
 build/
 .ccls-cache/
