@@ -1,10 +1,12 @@
-//
-// 2024-2025 KTÜ Bilgisayar Mühendisliği
-// Object Oriented Programming Dönem Ödevi
-//
-// 434377 - Deniz Tunç
-// 439553 - Emre Camuzoğlu
-//
+ ///////////////////////////////////////////////
+//                                             //
+//    2024-2025 KTÜ Bilgisayar Mühendisliği    //
+//   Object Oriented Programming Dönem Ödevi   //
+//                                             //
+//           434377 - Deniz Tunç               //
+//           439553 - Emre Camuzoğlu           //
+//                                             //
+ ///////////////////////////////////////////////
 
 #include <iostream>
 #include <fstream>
