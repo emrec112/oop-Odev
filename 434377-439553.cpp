@@ -173,7 +173,7 @@ class Student{
 
           print_header(cout);
 
-          for(int i = 0; i < studentCount - 1; i++){
+          for(int i = 0; i < studentCount; i++){
             print_row(i, cout);
           }
         }
@@ -183,7 +183,7 @@ class Student{
 
           print_header(cout);
 
-          for(int i = 0; i < studentCount - 1; i++){
+          for(int i = 0; i < studentCount; i++){
             //geçenlerden 50 ve 50'den aşağısını alma
             if((average(i)) <= 50 && durum == DURUM_GECTI)
                 continue;
@@ -204,7 +204,7 @@ class Student{
 
             print_header(printfile);
 
-            for(int i = 0; i < studentCount - 1; i++){
+            for(int i = 0; i < studentCount; i++){
               //geçenlerden 50 ve 50'den aşağısını alma
               if((average(i)) <= 50 && durum == DURUM_GECTI)
                   continue;
@@ -222,7 +222,7 @@ int main() {
 
     ifstream file("data.csv");
     // Okunacak öğrenci sayısını satır sayısına göre ayarlıyoruz.
-    int student_count = 0;
+    int student_count = -1;
 
     string tmp_line;
 
